@@ -283,8 +283,11 @@ static void php_runkit_register_auto_global(char *s, int len TSRMLS_DC)
 	}
 
 #ifdef ZEND_ENGINE_2
+#if PHP_VERSION_ID >= 50400
+	if (zend_register_auto_global(s, len, 0, NULL TSRMLS_CC) == SUCCESS) {
+#else
 	if (zend_register_auto_global(s, len, NULL TSRMLS_CC) == SUCCESS) {
-
+#endif
 		/* This shouldn't be necessary, but it is */
 		zend_auto_global_disable_jit(s, len TSRMLS_CC);
 #else
