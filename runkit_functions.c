@@ -150,7 +150,7 @@ void php_runkit_function_copy_ctor(zend_function *fe, char *newname)
 				opcode_copy[i].op1.u.jmp_addr =  opcode_copy + (fe->op_array.opcodes[i].op1.u.jmp_addr - fe->op_array.opcodes);
 			}
 #endif
-        }
+		}
 
 		if (opcode_copy[i].op2.op_type == IS_CONST) {
 			zval_copy_ctor(&opcode_copy[i].op2.u.constant);
