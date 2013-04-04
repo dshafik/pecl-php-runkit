@@ -85,6 +85,8 @@ int php_runkit_sandbox_array_deep_copy(zval **value ZEND_HASH_APPLY_ARGS_TSRMLS_
  *		open_basedir must be at or below the currently defined basedir for the same reason that safe_mode can only be turned on
  * allow_url_fopen = false
  *		allow_url_fopen may only be turned off for a sandbox, not on.   Once again, don't castrate the existing restrictions
+ * allow_url_include = false
+ *		allow_url_include may only be turned off for a sandbox, not on.   Once again, don't castrate the existing restrictions
  * disable_functions = coma_separated,list_of,additional_functions
  *		ADDITIONAL functions, on top of already disabled functions to disable
  * disable_classes = coma_separated,list_of,additional_classes
@@ -100,6 +102,7 @@ inline void php_runkit_sandbox_ini_override(php_runkit_sandbox_object *objval, H
 	zend_bool safe_mode, safe_mode_gid;
 #endif
 	zend_bool allow_url_fopen;
+	zend_bool allow_url_include;
 	char open_basedir[MAXPATHLEN] = {0}, safe_mode_include_dir[MAXPATHLEN] = {0};
 	zval **tmpzval;
 
@@ -120,6 +123,7 @@ inline void php_runkit_sandbox_ini_override(php_runkit_sandbox_object *objval, H
 			VCWD_REALPATH(PG(open_basedir), open_basedir);
 		}
 		allow_url_fopen = PG(allow_url_fopen);
+		allow_url_include = PG(allow_url_include);
 	}
 	tsrm_set_interpreter_context(objval->context);
 
@@ -212,6 +216,19 @@ inline void php_runkit_sandbox_ini_override(php_runkit_sandbox_object *objval, H
 
 		if (!Z_BVAL(copyval)) {
 			zend_alter_ini_entry("allow_url_fopen", sizeof("allow_url_fopen"), "0", 1, PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE);
+		}
+	}
+
+	/* allow_url_include goes off only */
+	if (allow_url_include &&
+		zend_hash_find(options, "allow_url_include", sizeof("allow_url_include"), (void**)&tmpzval) == SUCCESS) {
+		zval copyval = **tmpzval;
+
+		zval_copy_ctor(&copyval);
+		convert_to_boolean(&copyval);
+
+		if (!Z_BVAL(copyval)) {
+			zend_alter_ini_entry("allow_url_include", sizeof("allow_url_include"), "0", 1, PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE);
 		}
 	}
 
