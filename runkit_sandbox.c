@@ -208,26 +208,18 @@ inline void php_runkit_sandbox_ini_override(php_runkit_sandbox_object *objval, H
 
 	/* allow_url_fopen goes off only */
 	if (allow_url_fopen &&
-		zend_hash_find(options, "allow_url_fopen", sizeof("allow_url_fopen"), (void**)&tmpzval) == SUCCESS) {
-		zval copyval = **tmpzval;
+		zend_hash_find(options, "allow_url_fopen", sizeof("allow_url_fopen"), (void**)&tmpzval) == SUCCESS && !zend_is_true(*tmpzval)) {
 
-		zval_copy_ctor(&copyval);
-		convert_to_boolean(&copyval);
-
-		if (!Z_BVAL(copyval)) {
+		if (!Z_BVAL(*tmpzval)) {
 			zend_alter_ini_entry("allow_url_fopen", sizeof("allow_url_fopen"), "0", 1, PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE);
 		}
 	}
 
 	/* allow_url_include goes off only */
 	if (allow_url_include &&
-		zend_hash_find(options, "allow_url_include", sizeof("allow_url_include"), (void**)&tmpzval) == SUCCESS) {
-		zval copyval = **tmpzval;
+		zend_hash_find(options, "allow_url_include", sizeof("allow_url_include"), (void**)&tmpzval) == SUCCESS && !zend_is_true(*tmpzval)) {
 
-		zval_copy_ctor(&copyval);
-		convert_to_boolean(&copyval);
-
-		if (!Z_BVAL(copyval)) {
+		if (!Z_BVAL(*tmpzval)) {
 			zend_alter_ini_entry("allow_url_include", sizeof("allow_url_include"), "0", 1, PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE);
 		}
 	}
